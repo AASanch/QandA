@@ -7,17 +7,28 @@ import { searchQuestions, QuestionData } from "../data/QuestionsData";
 import React from "react";
 import { Page } from "./Page";
 
+import { useSelector, useDispatch } from "react-redux";
+import {
+  AppState,
+  searchingQuestionsAction,
+  searchedQuestionsAction
+} from "../data/Store";
+
 export const SearchPage = () => {
+  const dispatch = useDispatch();
+  const questions = useSelector((state: AppState) => state.questions.searched);
+
   const [searchParams] = useSearchParams();
-  const [questions, setQuestions] = React.useState<QuestionData[]>([]);
   const search = searchParams.get("criteria") || "";
 
   React.useEffect(() => {
     const doSearch = async (criteria: string) => {
+      dispatch(searchingQuestionsAction());
       const foundResults = await searchQuestions(criteria);
-      setQuestions(foundResults);
+      dispatch(searchedQuestionsAction(foundResults));
     };
     doSearch(search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   return (
